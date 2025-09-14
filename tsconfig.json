@@ -21,6 +21,7 @@
   },
   "include": [
     "hooks/**/*",
+    "context/**/*",
     "components/**/*",
     "index.ts"
   ],
