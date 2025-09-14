@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaGoogle, FaGithub, FaEnvelope, FaApple, FaFacebook, FaTwitter, FaLinkedin, FaDiscord } from 'react-icons/fa';
+import { useTenant } from '../context/TenantContext';
 
 export interface LoginProvider {
   id: string;
@@ -14,7 +15,6 @@ export interface LoginProvider {
 }
 
 interface LoginComponentProps {
-  providers: LoginProvider[];
   tenantName?: string;
   onProviderClick?: (provider: LoginProvider) => void;
   className?: string;
@@ -226,38 +226,77 @@ const spinKeyframes = `
   }
 `;
 
-export default function LoginComponent({ 
-  providers, 
+export default function LoginComponent({
   tenantName = 'Auth Tower',
   onProviderClick,
-  className = ''
 }: LoginComponentProps) {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState(false);
   const [hoveredProvider, setHoveredProvider] = useState<string | null>(null);
   const [emailButtonHovered, setEmailButtonHovered] = useState(false);
+  const { sdk, sdkReady} = useTenant();
+  const [providers, setProviders] = useState<LoginProvider[]>([]);
 
+    
+  useEffect(() => {
+    if (!sdkReady || !sdk) return;
+
+    async function fetchProviders() {
+      if (!sdk) return;
+      
+      const tenantID = sdk.config.tenantId;
+      console.log('Current Tenant ID:', tenantID);
+      try {
+        const response = await sdk.idProviderClient.getActiveProviders(tenantID || undefined);
+
+        // Convert API methods to LoginProvider format
+        const formattedProviders: LoginProvider[] = response.providers.map((provider) => ({
+          id: provider.id,
+          name: getProviderDisplayName(provider.provider),
+          provider: provider.provider,
+          enabled: true,
+          color: getProviderColor(provider.provider),
+          textColor: getProviderTextColor(provider.provider),
+        }));
+
+        setProviders(formattedProviders);
+      } catch (err) {
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProviders();
+  }, [sdkReady, sdk]);
+
+  const handleProviderClick = async (provider: LoginProvider) => {
+    if (!sdk) return;
+    
+    try {
+      const resp = await sdk.auth.initiateAuth({ 
+        provider: provider.provider, 
+        redirect_uri: window.location.origin + "/callback" 
+      });
+      window.location.href = resp.auth_url;
+    } catch (error) {
+      console.error('Login failed:', error);
+    }
+  };
   // Separate email provider from other providers
   const regularProviders = providers.filter(p => p.enabled && p.provider !== 'email');
   const hasEmailProvider = providers.some(p => p.enabled && p.provider === 'email');
 
-  const handleProviderClick = (provider: LoginProvider) => {
-    if (onProviderClick) {
-      onProviderClick(provider);
-    }
-  };
-
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+
     // Find email provider and trigger click
     const emailProvider = providers.find(p => p.provider === 'email');
     if (emailProvider && onProviderClick) {
       onProviderClick({ ...emailProvider, id: email });
     }
-    
+
     // Reset loading state after a delay (in real implementation, this would be handled by the parent)
     setTimeout(() => setLoading(false), 2000);
   };
@@ -286,7 +325,7 @@ export default function LoginComponent({
       case 'email':
         return <FaEnvelope style={iconStyle} />;
       default:
-        return <div style={{...iconStyle, fontSize: '16px'}}>{provider.provider.charAt(0).toUpperCase()}</div>;
+        return <div style={{ ...iconStyle, fontSize: '16px' }}>{provider.provider.charAt(0).toUpperCase()}</div>;
     }
   };
 
@@ -297,7 +336,7 @@ export default function LoginComponent({
     const styleSheet = document.createElement('style');
     styleSheet.textContent = spinKeyframes;
     document.head.appendChild(styleSheet);
-    
+
     return () => {
       if (document.head.contains(styleSheet)) {
         document.head.removeChild(styleSheet);
@@ -306,7 +345,7 @@ export default function LoginComponent({
   }, []);
 
   return (
-    <div style={styles.container} className={className}>
+    <div style={styles.container}>
       <div style={styles.header}>
         <h1 style={styles.title}>Log in to your account</h1>
         <div style={styles.subtitle}>Connect to {tenantName} with:</div>
@@ -377,9 +416,9 @@ export default function LoginComponent({
                 ...styles.validationIcon,
                 ...(isValidEmail ? styles.validIcon : styles.invalidIcon),
               }}>
-                <svg 
-                  style={{ width: '12px', height: '12px', color: '#ffffff' }} 
-                  fill="currentColor" 
+                <svg
+                  style={{ width: '12px', height: '12px', color: '#ffffff' }}
+                  fill="currentColor"
                   viewBox="0 0 20 20"
                 >
                   {isValidEmail ? (
@@ -418,4 +457,62 @@ export default function LoginComponent({
       )}
     </div>
   );
+}
+function getProviderDisplayName(authMethod: string): string {
+  switch (authMethod.toLowerCase()) {
+    case 'google':
+      return 'Google';
+    case 'github':
+      return 'GitHub';
+    case 'microsoft':
+      return 'Microsoft';
+    case 'facebook':
+      return 'Facebook';
+    case 'twitter':
+      return 'Twitter';
+    case 'linkedin':
+      return 'LinkedIn';
+    case 'apple':
+      return 'Apple';
+    case 'discord':
+      return 'Discord';
+    case 'email':
+      return 'Email OTP';
+    default:
+      return authMethod;
+  }
+}
+
+function getProviderColor(authMethod: string): string {
+  switch (authMethod.toLowerCase()) {
+    case 'google':
+      return 'bg-white border-gray-300';
+    case 'github':
+      return 'bg-gray-900';
+    case 'microsoft':
+      return 'bg-blue-600';
+    case 'facebook':
+      return 'bg-blue-600';
+    case 'twitter':
+      return 'bg-sky-500';
+    case 'linkedin':
+      return 'bg-blue-700';
+    case 'apple':
+      return 'bg-black';
+    case 'discord':
+      return 'bg-indigo-600';
+    case 'email':
+      return 'bg-cyan-600';
+    default:
+      return 'bg-gray-600';
+  }
+}
+
+function getProviderTextColor(authMethod: string): string {
+  switch (authMethod.toLowerCase()) {
+    case 'google':
+      return 'text-gray-700';
+    default:
+      return 'text-white';
+  }
 }
