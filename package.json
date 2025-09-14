@@ -1,0 +1,29 @@
+{
+  "name": "@auth-tower/react",
+  "version": "1.0.0",
+  "description": "Everything you need to integrate Auth Tower in your react app",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/auth-tower/react.git"
+  },
+  "scripts": {
+    "build": "npx tsc",
+    "dev": "npx tsc --watch",
+    "package": "npm run build && npm pack",
+    "prepublishOnly": "npm run build",
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [
+    "auth",
+    "tower",
+    "multi-tenancy",
+    "tenancy",
+    "subscription",
+    "management"
+  ],
+  "license": "ISC",
+  "author": "Kansotech",
+  "type": "commonjs"
+}
