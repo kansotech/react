@@ -17,6 +17,7 @@ export interface LoginProvider {
 interface LoginComponentProps {
   tenantName?: string;
   onProviderClick?: (provider: LoginProvider) => void;
+  redirectURI?: string;
   className?: string;
 }
 
@@ -228,6 +229,7 @@ const spinKeyframes = `
 
 export default function LoginComponent({
   tenantName = 'Auth Tower',
+  redirectURI,
   onProviderClick,
 }: LoginComponentProps) {
   const [email, setEmail] = useState('');
@@ -276,7 +278,7 @@ export default function LoginComponent({
     try {
       const resp = await sdk.auth.initiateAuth({ 
         provider: provider.provider, 
-        redirect_uri: window.location.origin + "/callback" 
+        redirect_uri: redirectURI ?? ''
       });
       window.location.href = resp.auth_url;
     } catch (error) {
