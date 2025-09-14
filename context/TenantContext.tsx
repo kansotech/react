@@ -40,8 +40,11 @@ interface TenantProviderProps {
 
 export function TenantProvider({ children, initialTenantId }: TenantProviderProps) {
   // Initialize SDK using the hook
-  const { sdk, isReady: sdkReady, isLoading: sdkLoading, error: sdkError } = useAuthTowerSDK();
-  
+  const { sdk, isReady: sdkReady, isLoading: sdkLoading, error: sdkError } = useAuthTowerSDK({
+    tenantId: initialTenantId || undefined,
+    baseURL: "https://www.api.auth-tower.com",
+  });
+
   const [currentTenant, setCurrentTenant] = useState<SDKTenantContext | null>(null);
   const [tenants, setTenants] = useState<TenantResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);

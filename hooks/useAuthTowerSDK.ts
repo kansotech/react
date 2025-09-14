@@ -43,7 +43,7 @@ export function useAuthTowerSDK(options?: UseAuthTowerSDKOptions): UseAuthTowerS
           };
 
           sdkRef.current = new AuthTowerSDK({
-            baseURL: options?.baseURL || getEnvVar('NEXT_PUBLIC_AUTH_TOWER_URL', "http://localhost:4000"),
+            baseURL: options?.baseURL || getEnvVar('NEXT_PUBLIC_AUTH_TOWER_URL', "https://www.api.auth-tower.com"),
             tenantId: options?.tenantId || getEnvVar('NEXT_PUBLIC_AUTH_TOWER_TENANT_ID', ""),
           });
         }
