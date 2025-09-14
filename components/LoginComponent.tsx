@@ -16,21 +16,227 @@ export interface LoginProvider {
 interface LoginComponentProps {
   providers: LoginProvider[];
   tenantName?: string;
-  previewMode?: boolean;
   onProviderClick?: (provider: LoginProvider) => void;
   className?: string;
 }
 
+// CSS-in-JS styles
+const styles = {
+  container: {
+    maxWidth: '400px',
+    margin: '0 auto',
+    backgroundColor: 'rgba(31, 41, 55, 0.95)', // dark gray with transparency
+    borderRadius: '16px',
+    padding: '32px',
+    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    backdropFilter: 'blur(16px)',
+    border: '1px solid rgba(75, 85, 99, 0.3)',
+    fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  },
+  header: {
+    textAlign: 'center' as const,
+    marginBottom: '32px',
+  },
+  title: {
+    fontSize: '24px',
+    fontWeight: '700',
+    background: 'linear-gradient(135deg, #ffffff 0%, #e5e7eb 100%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
+    marginBottom: '8px',
+    lineHeight: '1.2',
+  },
+  subtitle: {
+    color: '#d1d5db',
+    fontSize: '18px',
+    marginBottom: '16px',
+    fontWeight: '500',
+  },
+  description: {
+    color: '#9ca3af',
+    fontSize: '14px',
+    lineHeight: '1.4',
+  },
+  emailForm: {
+    marginBottom: '24px',
+  },
+  emailLabel: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    fontSize: '14px',
+    fontWeight: '500',
+    color: '#e5e7eb',
+    marginBottom: '12px',
+  },
+  emailInputContainer: {
+    position: 'relative' as const,
+    marginBottom: '20px',
+  },
+  emailInput: {
+    width: '100%',
+    padding: '16px',
+    fontSize: '16px',
+    color: '#ffffff',
+    backgroundColor: 'rgba(55, 65, 81, 0.8)',
+    border: '2px solid #4b5563',
+    borderRadius: '12px',
+    outline: 'none',
+    transition: 'all 0.2s ease',
+    boxSizing: 'border-box' as const,
+    backdropFilter: 'blur(8px)',
+  },
+  emailInputFocused: {
+    borderColor: '#06b6d4',
+    backgroundColor: 'rgba(31, 41, 55, 0.8)',
+    boxShadow: '0 0 0 4px rgba(6, 182, 212, 0.1)',
+  },
+  validationIcon: {
+    position: 'absolute' as const,
+    right: '12px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    width: '20px',
+    height: '20px',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  validIcon: {
+    backgroundColor: '#10b981',
+  },
+  invalidIcon: {
+    backgroundColor: '#ef4444',
+  },
+  emailButton: {
+    width: '100%',
+    padding: '16px',
+    background: 'linear-gradient(135deg, #0891b2 0%, #1d4ed8 100%)',
+    color: '#ffffff',
+    border: 'none',
+    borderRadius: '12px',
+    fontSize: '16px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '8px',
+    boxShadow: '0 4px 14px 0 rgba(8, 145, 178, 0.4)',
+  },
+  emailButtonHover: {
+    background: 'linear-gradient(135deg, #0e7490 0%, #1e40af 100%)',
+    transform: 'translateY(-1px)',
+    boxShadow: '0 8px 25px 0 rgba(8, 145, 178, 0.5)',
+  },
+  emailButtonDisabled: {
+    background: '#4b5563',
+    cursor: 'not-allowed',
+    transform: 'none',
+    boxShadow: 'none',
+  },
+  divider: {
+    display: 'flex',
+    alignItems: 'center',
+    margin: '32px 0',
+  },
+  dividerLine: {
+    flex: 1,
+    height: '1px',
+    background: 'linear-gradient(90deg, transparent 0%, #4b5563 50%, transparent 100%)',
+  },
+  dividerText: {
+    margin: '0 16px',
+    fontSize: '12px',
+    color: '#9ca3af',
+    fontWeight: '500',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.05em',
+  },
+  providersGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+    gap: '16px',
+  },
+  providerButton: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '12px',
+    padding: '16px 20px',
+    borderRadius: '12px',
+    border: '1px solid rgba(75, 85, 99, 0.5)',
+    backgroundColor: 'rgba(55, 65, 81, 0.8)',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+    textDecoration: 'none',
+    backdropFilter: 'blur(8px)',
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+  },
+  providerButtonHover: {
+    backgroundColor: 'rgba(75, 85, 99, 0.8)',
+    borderColor: '#6b7280',
+    transform: 'translateY(-1px)',
+    boxShadow: '0 8px 15px -3px rgba(0, 0, 0, 0.2)',
+  },
+  providerIcon: {
+    fontSize: '20px',
+  },
+  providerName: {
+    fontSize: '14px',
+    fontWeight: '500',
+    textAlign: 'center' as const,
+    lineHeight: '1.2',
+  },
+  loadingSpinner: {
+    width: '16px',
+    height: '16px',
+    border: '2px solid transparent',
+    borderTop: '2px solid currentColor',
+    borderRadius: '50%',
+    animation: 'spin 1s linear infinite',
+  },
+  previewBadge: {
+    marginTop: '16px',
+    textAlign: 'center' as const,
+  },
+  previewBadgeInner: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '4px 8px',
+    backgroundColor: 'rgba(217, 119, 6, 0.1)',
+    color: '#f59e0b',
+    borderRadius: '9999px',
+    fontSize: '12px',
+    fontWeight: '500',
+    border: '1px solid rgba(217, 119, 6, 0.3)',
+  },
+};
+
+// Add keyframes for spinner animation
+const spinKeyframes = `
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+`;
+
 export default function LoginComponent({ 
   providers, 
-  tenantName = 'Auth Tower', 
-  previewMode = false, 
+  tenantName = 'Auth Tower',
   onProviderClick,
   className = ''
 }: LoginComponentProps) {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState(false);
+  const [hoveredProvider, setHoveredProvider] = useState<string | null>(null);
+  const [emailButtonHovered, setEmailButtonHovered] = useState(false);
 
   // Separate email provider from other providers
   const regularProviders = providers.filter(p => p.enabled && p.provider !== 'email');
@@ -44,164 +250,172 @@ export default function LoginComponent({
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (previewMode) {
-      console.log('Preview mode: Email OTP would be sent to', email);
-      return;
-    }
     setLoading(true);
-    // Handle actual email submission
+    
+    // Find email provider and trigger click
+    const emailProvider = providers.find(p => p.provider === 'email');
+    if (emailProvider && onProviderClick) {
+      onProviderClick({ ...emailProvider, id: email });
+    }
+    
+    // Reset loading state after a delay (in real implementation, this would be handled by the parent)
     setTimeout(() => setLoading(false), 2000);
   };
 
-  const getProviderIcon = (provider: string) => {
-    switch (provider.toLowerCase()) {
+  const getProviderIcon = (provider: LoginProvider) => {
+    const iconStyle = {
+      ...styles.providerIcon,
+      color: provider.color || '#ffffff',
+    };
+
+    switch (provider.provider.toLowerCase()) {
       case 'google':
-        return <FaGoogle className="w-5 h-5" />;
+        return <FaGoogle style={iconStyle} />;
       case 'github':
-        return <FaGithub className="w-5 h-5" />;
-      case 'microsoft':
-        return <FaEnvelope className="w-5 h-5" />; // Using envelope as placeholder
-      case 'facebook':
-        return <FaFacebook className="w-5 h-5" />;
-      case 'twitter':
-        return <FaTwitter className="w-5 h-5" />;
-      case 'linkedin':
-        return <FaLinkedin className="w-5 h-5" />;
+        return <FaGithub style={iconStyle} />;
       case 'apple':
-        return <FaApple className="w-5 h-5" />;
+        return <FaApple style={iconStyle} />;
+      case 'facebook':
+        return <FaFacebook style={iconStyle} />;
+      case 'twitter':
+        return <FaTwitter style={iconStyle} />;
+      case 'linkedin':
+        return <FaLinkedin style={iconStyle} />;
       case 'discord':
-        return <FaDiscord className="w-5 h-5" />;
+        return <FaDiscord style={iconStyle} />;
+      case 'email':
+        return <FaEnvelope style={iconStyle} />;
       default:
-        return <FaEnvelope className="w-5 h-5" />;
+        return <div style={{...iconStyle, fontSize: '16px'}}>{provider.provider.charAt(0).toUpperCase()}</div>;
     }
   };
 
   const isValidEmail = email.includes("@") && email.includes(".");
 
+  // Inject spinner keyframes
+  React.useEffect(() => {
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = spinKeyframes;
+    document.head.appendChild(styleSheet);
+    
+    return () => {
+      if (document.head.contains(styleSheet)) {
+        document.head.removeChild(styleSheet);
+      }
+    };
+  }, []);
+
   return (
-    <div className={`w-full max-w-md mx-auto ${className}`}>
-      <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl rounded-2xl border border-gray-200/50 dark:border-gray-700/50 p-8 shadow-2xl">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2">
-            Log in to your account
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300">
-            Connect to {tenantName} with:
-          </p>
-        </div>
-
-        {/* Social Providers */}
-        {regularProviders.length > 0 && (
-          <div className="space-y-3 mb-8">
-            <div className={`grid ${regularProviders.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-4`}>
-              {regularProviders.map((provider) => (
-                <button
-                  key={provider.id}
-                  onClick={() => handleProviderClick(provider)}
-                  className="flex items-center justify-center gap-3 py-4 px-4 rounded-lg bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm hover:bg-white dark:hover:bg-slate-700 transition-all duration-200 border border-gray-300/50 dark:border-gray-600/50 hover:border-gray-400 dark:hover:border-gray-500 group cursor-pointer shadow-md hover:shadow-lg"
-                >
-                  <span className="group-hover:scale-110 transition-transform duration-200 text-gray-700 dark:text-gray-300">
-                    {getProviderIcon(provider.provider)}
-                  </span>
-                  <span className="font-medium text-gray-700 dark:text-gray-300">{provider.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Divider - only show if we have both regular providers and email */}
-        {regularProviders.length > 0 && hasEmailProvider && (
-          <div className="flex items-center my-8">
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent"></div>
-            <span className="mx-4 text-gray-500 dark:text-gray-400 text-sm font-medium uppercase tracking-wider">OR LOG IN WITH OTP</span>
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent"></div>
-          </div>
-        )}
-
-        {/* Email Login - only show if email provider is enabled */}
-        {hasEmailProvider && (
-          <form onSubmit={handleEmailSubmit} className="space-y-6">
-            <div>
-              <label className="flex items-center gap-3 text-gray-700 dark:text-gray-300 font-medium mb-3">
-                <FaEnvelope className="w-4 h-4" />
-                Email
-              </label>
-              <div className="relative">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onFocus={() => setFocused(true)}
-                  onBlur={() => setFocused(false)}
-                  placeholder="Enter your email address"
-                  className={`w-full p-4 rounded-lg bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm border-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-200 focus:outline-none ${
-                    focused 
-                      ? 'border-cyan-500 ring-2 ring-cyan-500/20' 
-                      : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
-                  }`}
-                  required
-                />
-                {email && (
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    {isValidEmail ? (
-                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
-                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                    ) : (
-                      <div className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center">
-                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading || !isValidEmail}
-              className={`w-full flex items-center justify-center gap-3 py-4 rounded-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 ${
-                loading || !isValidEmail
-                  ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl hover:scale-[1.02] cursor-pointer'
-              }`}
-            >
-              {loading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Sending OTP...</span>
-                </>
-              ) : (
-                <>
-                  <FaEnvelope className="w-4 h-4" />
-                  <span>Send OTP</span>
-                </>
-              )}
-            </button>
-          </form>
-        )}
-
-        {/* Footer */}
-        <div className="mt-8 text-center text-gray-500 dark:text-gray-400 text-sm">
-          This will create an account if you don&apos;t have one yet.
-        </div>
-
-        {/* Preview Mode Indicator */}
-        {previewMode && (
-          <div className="mt-4 text-center">
-            <div className="inline-flex items-center space-x-1 px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 rounded-full text-xs font-medium border border-amber-200 dark:border-amber-700">
-              <span>👁️</span>
-              <span>Preview Mode</span>
-            </div>
-          </div>
-        )}
+    <div style={styles.container} className={className}>
+      <div style={styles.header}>
+        <h1 style={styles.title}>Log in to your account</h1>
+        <div style={styles.subtitle}>Connect to {tenantName} with:</div>
+        <div style={styles.description}>This will create an account if you don't have one yet.</div>
       </div>
+
+      {regularProviders.length > 0 && (
+        <>
+          <div style={styles.providersGrid}>
+            {regularProviders.map((provider) => (
+              <button
+                key={provider.id}
+                onClick={() => handleProviderClick(provider)}
+                onMouseEnter={() => setHoveredProvider(provider.id)}
+                onMouseLeave={() => setHoveredProvider(null)}
+                style={{
+                  ...styles.providerButton,
+                  backgroundColor: provider.color || styles.providerButton.backgroundColor,
+                  ...(hoveredProvider === provider.id ? styles.providerButtonHover : {}),
+                }}
+              >
+                {getProviderIcon(provider)}
+                <span
+                  style={{
+                    ...styles.providerName,
+                    color: provider.textColor || '#ffffff',
+                  }}
+                >
+                  {provider.name}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {hasEmailProvider && (
+            <div style={styles.divider}>
+              <div style={styles.dividerLine} />
+              <span style={styles.dividerText}>OR LOG IN WITH OTP</span>
+              <div style={styles.dividerLine} />
+            </div>
+          )}
+        </>
+      )}
+
+      {hasEmailProvider && (
+        <form style={styles.emailForm} onSubmit={handleEmailSubmit}>
+          <label style={styles.emailLabel} htmlFor="email">
+            <FaEnvelope />
+            Email
+          </label>
+          <div style={styles.emailInputContainer}>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              placeholder="Enter your email address"
+              required
+              style={{
+                ...styles.emailInput,
+                ...(focused ? styles.emailInputFocused : {}),
+              }}
+            />
+            {email && (
+              <div style={{
+                ...styles.validationIcon,
+                ...(isValidEmail ? styles.validIcon : styles.invalidIcon),
+              }}>
+                <svg 
+                  style={{ width: '12px', height: '12px', color: '#ffffff' }} 
+                  fill="currentColor" 
+                  viewBox="0 0 20 20"
+                >
+                  {isValidEmail ? (
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  ) : (
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  )}
+                </svg>
+              </div>
+            )}
+          </div>
+          <button
+            type="submit"
+            disabled={loading || !isValidEmail}
+            onMouseEnter={() => setEmailButtonHovered(true)}
+            onMouseLeave={() => setEmailButtonHovered(false)}
+            style={{
+              ...styles.emailButton,
+              ...(emailButtonHovered && !loading && isValidEmail ? styles.emailButtonHover : {}),
+              ...(loading || !isValidEmail ? styles.emailButtonDisabled : {}),
+            }}
+          >
+            {loading ? (
+              <>
+                <div style={styles.loadingSpinner} />
+                Sending OTP...
+              </>
+            ) : (
+              <>
+                <FaEnvelope />
+                Send OTP
+              </>
+            )}
+          </button>
+        </form>
+      )}
     </div>
   );
 }
